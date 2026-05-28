@@ -172,6 +172,9 @@
                 <tbody id="leaderboard-body">
                     </tbody>
             </table>
+            <div class="server-info">
+                <p>サーバー合計起動時間: <span id="uptime-display">計算中...</span></p>
+            </div>
             <div id="loading" class="loading">データを読み込んでいます...</div>
             <div id="error" class="error-msg" style="display: none;">データの読み込みに失敗しました。</div>
         </div>
@@ -205,6 +208,11 @@
 
                 // 最終更新時間をセット
                 lastUpdatedSpan.textContent = data.last_updated || '不明';
+
+                const uptimeSpan = document.getElementById('uptime-display');
+                if (uptimeSpan && data.server_uptime_seconds) {
+                    uptimeSpan.textContent = formatUptime(data.server_uptime_seconds);
+                }
 
                 // プレイヤー一覧をクリア
                 tbody.innerHTML = '';

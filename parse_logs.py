@@ -12,9 +12,12 @@ def parse_logs():
     log_pattern = re.compile(
         r'^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}):\d{3} INFO\] Player (connected|disconnected): ([^,]+), xuid: (\d+)'
     )
+    # ログのすべての行から日時だけを抽出するパターン（サーバー起動時間特定用）
+    time_pattern = re.compile(r'^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
 
     player_stats = {}      # xuid -> {name, xuid, playtime_seconds, last_seen}
     active_sessions = {}   # xuid -> login_datetime
+    first_log_time = None
     last_log_time = None
 
     if not os.path.exists(LOG_FILE_PATH):
@@ -24,6 +27,11 @@ def parse_logs():
     # ログファイルを読み込んで集計
     with open(LOG_FILE_PATH, 'r', encoding='utf-8', errors='ignore') as f:
         for line in f:
+            # ログ全体の「一番最初の行の時刻」をサーバー起動時刻として記録
+            t_match = time_pattern.match(line)
+            if t_match and first_log_time is None:
+                first_log_time = datetime.strptime(t_match.group(1), "%Y-%m-%d %H:%M:%S")
+
             match = log_pattern.match(line)
             if match:
                 time_str, event, name, xuid = match.groups()
@@ -59,9 +67,15 @@ def parse_logs():
             player_stats[xuid]["playtime_seconds"] += int(duration)
             player_stats[xuid]["last_seen"] = "オンライン中"
 
+    # サーバー全体の合計起動時間を計算（最初のログから現在時刻までの秒数）
+    server_uptime_seconds = 0
+    if first_log_time:
+        server_uptime_seconds = int((datetime.now() - first_log_time).total_seconds())
+
     # HTML側で扱いやすいJSON構造に変換
     output_data = {
         "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "server_uptime_seconds": server_uptime_seconds,  # ★ここに合計起動秒数を追加！
         "players": list(player_stats.values())
     }
 
