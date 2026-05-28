@@ -114,16 +114,17 @@
             color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
-        /* 簡易的なアバター風の四角（将来的にスキン画像などを入れるスペースにできます） */
-        .avatar-placeholder {
-            width: 24px;
-            height: 24px;
-            background-color: #444;
-            border-radius: 4px;
-            display: inline-block;
+        /* プレイヤーアバターのスタイル設定 */
+        .player-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: cover;
+            background-color: #444; /* 画像読み込み前、または画像がない時の背景 */
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .playtime {
@@ -136,6 +137,14 @@
         .last-seen {
             font-size: 0.85rem;
             color: var(--text-muted);
+        }
+
+        .server-info {
+            padding: 16px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            color: var(--text-color);
         }
 
         .loading, .error-msg {
@@ -170,7 +179,7 @@
                     </tr>
                 </thead>
                 <tbody id="leaderboard-body">
-                    </tbody>
+                </tbody>
             </table>
             <div class="server-info">
                 <p>サーバー合計起動時間: <span id="uptime-display">計算中...</span></p>
@@ -179,7 +188,8 @@
             <div id="error" class="error-msg" style="display: none;">データの読み込みに失敗しました。</div>
         </div>
     </main>
-<script>
+
+    <script>
         // 秒数を「〇時間〇分」の形式に変換する関数（プレイヤー用）
         function formatPlaytime(seconds) {
             const hours = Math.floor(seconds / 3600);
@@ -222,7 +232,7 @@
                 // 最終更新時間をセット
                 lastUpdatedSpan.textContent = data.last_updated || '不明';
 
-                // サーバー合計起動時間をセット（追加した関数を呼び出す）
+                // サーバー合計起動時間をセット
                 const uptimeSpan = document.getElementById('uptime-display');
                 if (uptimeSpan && data.server_uptime_seconds) {
                     uptimeSpan.textContent = formatUptime(data.server_uptime_seconds);
@@ -241,11 +251,15 @@
                     sortedPlayers.forEach((player, index) => {
                         const row = document.createElement('tr');
                         
+                        // 画像ファイル名を生成（スペース等の特殊文字を安全にURL化）
+                        const avatarUrl = `${encodeURIComponent(player.name)}.png`;
+                        
                         row.innerHTML = `
                             <td class="rank">${index + 1}</td>
                             <td>
                                 <div class="player-name">
-                                    <div class="avatar-placeholder"></div>
+                                    <!--onerror属性を使って、画像がない時は透明化して背景のグレー四角だけを残す処理-->
+                                    <img class="player-avatar" src="${avatarUrl}" alt="" onerror="if(!this.dataset.error){this.dataset.error=true; this.src='place_holder.png';}">
                                     ${escapeHtml(player.name)}
                                 </div>
                             </td>

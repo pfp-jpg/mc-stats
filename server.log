@@ -17923,3 +17923,38 @@ NO LOG FILE! - setting up server logging...
 [2026-05-28 08:13:00:952 INFO] Server stop requested.
 [2026-05-28 08:13:01:028 INFO] Stopping server...
 Quit correctly
+NO LOG FILE! - setting up server logging...
+[2026-05-28 15:55:15:136 INFO] Starting Server
+[2026-05-28 15:55:15:136 INFO] Version: 1.26.20.5
+[2026-05-28 15:55:15:136 INFO] Session ID: 4c39d869-4c59-4eab-8d01-a578500add28
+[2026-05-28 15:55:15:136 INFO] Build ID: 43875356
+[2026-05-28 15:55:15:136 INFO] Branch: r/26_u2
+[2026-05-28 15:55:15:136 INFO] Commit ID: 1f6d1b10fc43f4c331af96d99ef1fe30ea642ed3
+[2026-05-28 15:55:15:136 INFO] Configuration: Publish
+[2026-05-28 15:55:15:137 INFO] Level Name: Bedrock level
+[2026-05-28 15:55:15:142 INFO] No CDN config file found at: cdn_config.json for dedicated server
+[2026-05-28 15:55:15:142 INFO] Game mode: 0 Survival
+[2026-05-28 15:55:15:142 INFO] Difficulty: 2 NORMAL
+[2026-05-28 15:55:15:144 WARN] Content logging to console is disabled.  Enable it with content-log-console-output-enabled=true in server.properties
+[2026-05-28 15:55:15:685 INFO] Content logging to disk is enabled. Writing log to: ContentLog2026-05-28_15-55-15
+[2026-05-28 15:55:15:686 INFO] Opening level 'worlds/Bedrock level/db'
+[2026-05-28 15:55:15:736 INFO] Pack Stack - [00] 便利アドオン (id: 4735afe1-f006-4166-9754-4473d299580f, version: 1.0.0) @ behavior_packs/bennri
+[2026-05-28 15:55:15:736 INFO] Pack Stack - [01] dia (id: f4dee886-56eb-434a-925e-e874ba55a53c, version: 1.0.0) @ behavior_packs/dia
+[2026-05-28 15:55:15:736 INFO] Pack Stack - [02] §l§o§erestore (id: 2cae2573-7054-47eb-9d7b-fda1f42ca471, version: 1.0.0) @ behavior_packs/re_beh
+[2026-05-28 15:55:16:421 INFO] IPv4 supported, port: 19132: Used for gameplay and LAN discovery
+[2026-05-28 15:55:16:421 INFO] IPv6 supported, port: 19133: Used for gameplay
+[2026-05-28 15:55:16:441 INFO] Server started.
+[2026-05-28 15:55:16:441 INFO] ================ TELEMETRY MESSAGE ===================
+[2026-05-28 15:55:16:441 INFO] Server Telemetry is currently not enabled. 
+[2026-05-28 15:55:16:441 INFO] Enabling this telemetry helps us improve the game.
+[2026-05-28 15:55:16:441 INFO] 
+[2026-05-28 15:55:16:441 INFO] To enable this feature, add the line 'emit-server-telemetry=true'
+[2026-05-28 15:55:16:441 INFO] to the server.properties file in the handheld/src-server directory
+[2026-05-28 15:55:16:441 INFO] ======================================================
+[2026-05-28 16:10:15:830 INFO] Running AutoCompaction...
+[2026-05-28 16:16:15:837 INFO] Running AutoCompaction...
+[2026-05-28 16:22:15:878 INFO] Running AutoCompaction...
+[2026-05-28 16:28:15:893 INFO] Running AutoCompaction...
+[2026-05-28 16:34:15:902 INFO] Running AutoCompaction...
+[2026-05-28 16:48:46:102 INFO] Running AutoCompaction...
+[2026-05-28 16:54:46:115 INFO] Running AutoCompaction...
