@@ -12,4 +12,4 @@ python3 parse_logs.py
 # 4. GitHubに自動でアップロード
 git add playtime.json update_dashboard.sh
 git commit -m "Auto-update playtime: $(date '+%Y-%m-%d %H:%M:%S')"
-git push origin main
+git push origin main --force
