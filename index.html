@@ -179,8 +179,8 @@
             <div id="error" class="error-msg" style="display: none;">データの読み込みに失敗しました。</div>
         </div>
     </main>
-    <script>
-        // 秒数を「〇時間〇分」の形式に変換する関数
+<script>
+        // 秒数を「〇時間〇分」の形式に変換する関数（プレイヤー用）
         function formatPlaytime(seconds) {
             const hours = Math.floor(seconds / 3600);
             const minutes = Math.floor((seconds % 3600) / 60);
@@ -189,6 +189,19 @@
                 return `${hours}時間 ${minutes}分`;
             }
             return `${minutes}分`;
+        }
+
+        // 秒数を「〇日〇時間〇分」の形式に変換する関数（サーバー起動時間用）
+        function formatUptime(seconds) {
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+
+            let result = '';
+            if (days > 0) result += `${days}日 `;
+            if (hours > 0 || days > 0) result += `${hours}時間 `;
+            result += `${minutes}分`;
+            return result;
         }
 
         // JSONデータを取得してテーブルを描画する関数
@@ -209,6 +222,7 @@
                 // 最終更新時間をセット
                 lastUpdatedSpan.textContent = data.last_updated || '不明';
 
+                // サーバー合計起動時間をセット（追加した関数を呼び出す）
                 const uptimeSpan = document.getElementById('uptime-display');
                 if (uptimeSpan && data.server_uptime_seconds) {
                     uptimeSpan.textContent = formatUptime(data.server_uptime_seconds);
