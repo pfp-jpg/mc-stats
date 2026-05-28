@@ -34,7 +34,7 @@
 
         header {
             width: 100%;
-            max-width: 800px;
+            max-width: 850px;
             margin-bottom: 30px;
             text-align: center;
         }
@@ -59,7 +59,7 @@
 
         main {
             width: 100%;
-            max-width: 800px;
+            max-width: 850px;
         }
 
         .stats-container {
@@ -117,13 +117,12 @@
             gap: 12px;
         }
 
-        /* プレイヤーアバターのスタイル設定 */
         .player-avatar {
             width: 28px;
             height: 28px;
             border-radius: 6px;
             object-fit: cover;
-            background-color: #444; /* 画像読み込み前、または画像がない時の背景 */
+            background-color: #444;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -134,17 +133,31 @@
             font-size: 1.1rem;
         }
 
+        .count-display {
+            font-family: 'Courier New', Courier, monospace;
+            color: #e0e0e0;
+            font-weight: bold;
+        }
+
         .last-seen {
             font-size: 0.85rem;
             color: var(--text-muted);
         }
 
         .server-info {
-            padding: 16px;
+            padding: 16px 20px;
             background-color: rgba(0, 0, 0, 0.2);
             border-top: 1px solid var(--border-color);
             font-size: 0.95rem;
             color: var(--text-color);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .server-info p {
+            margin: 0;
         }
 
         .loading, .error-msg {
@@ -175,6 +188,7 @@
                         <th style="text-align: center;">順位</th>
                         <th>プレイヤー</th>
                         <th>総プレイ時間</th>
+                        <th>鯖入/出回数</th>
                         <th>最終ログイン</th>
                     </tr>
                 </thead>
@@ -183,6 +197,7 @@
             </table>
             <div class="server-info">
                 <p>サーバー合計起動時間: <span id="uptime-display">計算中...</span></p>
+                <p>鯖開閉回数: <span id="server-open-display">データなし</span>回</p>
             </div>
             <div id="loading" class="loading">データを読み込んでいます...</div>
             <div id="error" class="error-msg" style="display: none;">データの読み込みに失敗しました。</div>
@@ -201,17 +216,19 @@
             return `${minutes}分`;
         }
 
-        // 秒数を「〇日〇時間〇分」の形式に変換する関数（サーバー起動時間用）
-        function formatUptime(seconds) {
+        // 秒数を「〇日〇時間〇分（計〇〇時間）」の形式に変換する関数
+        function formatUptimeWithHours(seconds) {
+            const totalHours = Math.floor(seconds / 3600);
             const days = Math.floor(seconds / 86400);
             const hours = Math.floor((seconds % 86400) / 3600);
             const minutes = Math.floor((seconds % 3600) / 60);
 
-            let result = '';
-            if (days > 0) result += `${days}日 `;
-            if (hours > 0 || days > 0) result += `${hours}時間 `;
-            result += `${minutes}分`;
-            return result;
+            let formatted = '';
+            if (days > 0) formatted += `${days}日 `;
+            if (hours > 0 || days > 0) formatted += `${hours}時間 `;
+            formatted += `${minutes}分`;
+
+            return `${formatted} （計${totalHours}時間）`;
         }
 
         // JSONデータを取得してテーブルを描画する関数
@@ -232,10 +249,16 @@
                 // 最終更新時間をセット
                 lastUpdatedSpan.textContent = data.last_updated || '不明';
 
-                // サーバー合計起動時間をセット
+                // サーバー合計起動時間をセット（括弧付き時間対応版）
                 const uptimeSpan = document.getElementById('uptime-display');
                 if (uptimeSpan && data.server_uptime_seconds) {
-                    uptimeSpan.textContent = formatUptime(data.server_uptime_seconds);
+                    uptimeSpan.textContent = formatUptimeWithHours(data.server_uptime_seconds);
+                }
+
+                // 鯖開閉回数をセット
+                const serverOpenSpan = document.getElementById('server-open-display');
+                if (serverOpenSpan && data.server_open_count !== undefined) {
+                    serverOpenSpan.textContent = data.server_open_count;
                 }
 
                 // プレイヤー一覧をクリア
@@ -245,7 +268,7 @@
                 const sortedPlayers = data.players.sort((a, b) => b.playtime_seconds - a.playtime_seconds);
 
                 if (sortedPlayers.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">データがありません</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">データがありません</td></tr>';
                 } else {
                     // テーブルに行を追加
                     sortedPlayers.forEach((player, index) => {
@@ -254,16 +277,19 @@
                         // 画像ファイル名を生成（スペース等の特殊文字を安全にURL化）
                         const avatarUrl = `${encodeURIComponent(player.name)}.png`;
                         
+                        // 入出回数の初期値（データがない場合はハイフン）
+                        const joinCountText = player.join_count !== undefined ? `${player.join_count}回` : 'データなし';
+                        
                         row.innerHTML = `
                             <td class="rank">${index + 1}</td>
                             <td>
                                 <div class="player-name">
-                                    <!--onerror属性を使って、画像がない時は透明化して背景のグレー四角だけを残す処理-->
                                     <img class="player-avatar" src="${avatarUrl}" alt="" onerror="if(!this.dataset.error){this.dataset.error=true; this.src='place_holder.png';}">
                                     ${escapeHtml(player.name)}
                                 </div>
                             </td>
                             <td class="playtime">${formatPlaytime(player.playtime_seconds)}</td>
+                            <td class="count-display">${joinCountText}</td>
                             <td class="last-seen">${player.last_seen || 'データなし'}</td>
                         `;
                         tbody.appendChild(row);

@@ -15,10 +15,11 @@ def parse_logs():
     # ログのすべての行から日時だけを抽出するパターン（サーバー起動時間特定用）
     time_pattern = re.compile(r'^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
 
-    player_stats = {}      # xuid -> {name, xuid, playtime_seconds, last_seen}
+    player_stats = {}      # xuid -> {name, xuid, playtime_seconds, last_seen, join_count}
     active_sessions = {}   # xuid -> login_datetime
     first_log_time = None
     last_log_time = None
+    server_open_count = 0  # 鯖開閉回数のカウンタ
 
     if not os.path.exists(LOG_FILE_PATH):
         print(f"エラー: {LOG_FILE_PATH} が見つかりません。")
@@ -32,6 +33,11 @@ def parse_logs():
             if t_match and first_log_time is None:
                 first_log_time = datetime.strptime(t_match.group(1), "%Y-%m-%d %H:%M:%S")
 
+            # サーバーが起動（または再起動）したログを検知して開閉回数をカウント
+            # ※環境によって文言が若干違う場合があるため、一般的な "Starting Server" を検知します
+            if "INFO] Starting Server" in line or "INFO] Server started" in line:
+                server_open_count += 1
+
             match = log_pattern.match(line)
             if match:
                 time_str, event, name, xuid = match.groups()
@@ -44,6 +50,7 @@ def parse_logs():
                         "name": name,
                         "xuid": xuid,
                         "playtime_seconds": 0,
+                        "join_count": 0,  # ★入出回数の初期化
                         "last_seen": time_str
                     }
                 
@@ -52,6 +59,7 @@ def parse_logs():
 
                 if event == "connected":
                     active_sessions[xuid] = current_time
+                    player_stats[xuid]["join_count"] += 1  # ★ログイン回数を+1
                 elif event == "disconnected":
                     if xuid in active_sessions:
                         login_time = active_sessions[xuid]
@@ -59,6 +67,10 @@ def parse_logs():
                         player_stats[xuid]["playtime_seconds"] += int(duration)
                         del active_sessions[xuid]
                     player_stats[xuid]["last_seen"] = time_str
+
+    # 念のため、ログ全体で一度も起動ログが引っかからなかった場合の安全装置
+    if server_open_count == 0 and first_log_time is not None:
+        server_open_count = 1
 
     # 現在もオンライン中のプレイヤーの時間を、ログの最終記録時刻まで加算
     if last_log_time:
@@ -75,7 +87,8 @@ def parse_logs():
     # HTML側で扱いやすいJSON構造に変換
     output_data = {
         "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "server_uptime_seconds": server_uptime_seconds,  # ★ここに合計起動秒数を追加！
+        "server_uptime_seconds": server_uptime_seconds,
+        "server_open_count": server_open_count,  # ★ここにサーバー合計起動回数を追加！
         "players": list(player_stats.values())
     }
 
@@ -83,7 +96,7 @@ def parse_logs():
     with open(OUTPUT_JSON_PATH, 'w', encoding='utf-8') as f:
         json.dump(output_data, f, ensure_ascii=False, indent=2)
     
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] playtime.json を正常に更新しました。")
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] playtime.json を正常に更新しました。（開閉回数: {server_open_count}）")
 
 if __name__ == "__main__":
     parse_logs()
