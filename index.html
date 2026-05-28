@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+    <meta charset="UTF-8">
+    <title>蛮族の集い鯖　公式サイト</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent-color: #4caf50; /* マイクラ風のグリーン */
+            --accent-hover: #45a049;
+            --border-color: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .status-bar {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            background: var(--card-bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            border: 1px solid var(--border-color);
+        }
+
+        main {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .stats-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: rgba(255, 255, 255, 0.03);
+            color: #ffffff;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .rank {
+            font-weight: bold;
+            color: var(--text-muted);
+            width: 60px;
+            text-align: center;
+        }
+
+        tr:nth-child(1) .rank { color: #ffd700; } /* 1位: 金 */
+        tr:nth-child(2) .rank { color: #c0c0c0; } /* 2位: 銀 */
+        tr:nth-child(3) .rank { color: #cd7f32; } /* 3位: 銅 */
+
+        .player-name {
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 簡易的なアバター風の四角（将来的にスキン画像などを入れるスペースにできます） */
+        .avatar-placeholder {
+            width: 24px;
+            height: 24px;
+            background-color: #444;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .playtime {
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .last-seen {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .loading, .error-msg {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .error-msg {
+            color: #ff5252;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Minecraft Playtime Leaderboard</h1>
+        <div class="status-bar">
+            最終更新: <span id="last-updated">読み込み中...</span> (1時間に1回更新)
+        </div>
+    </header>
+
+    <main>
+        <div class="stats-container">
+            <table id="leaderboard-table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">順位</th>
+                        <th>プレイヤー</th>
+                        <th>総プレイ時間</th>
+                        <th>最終ログイン</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    </tbody>
+            </table>
+            <div id="loading" class="loading">データを読み込んでいます...</div>
+            <div id="error" class="error-msg" style="display: none;">データの読み込みに失敗しました。</div>
+        </div>
+    </main>
+    <script>
+        // 秒数を「〇時間〇分」の形式に変換する関数
+        function formatPlaytime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            
+            if (hours > 0) {
+                return `${hours}時間 ${minutes}分`;
+            }
+            return `${minutes}分`;
+        }
+
+        // JSONデータを取得してテーブルを描画する関数
+        async function loadDashboardData() {
+            const table = document.getElementById('leaderboard-table');
+            const tbody = document.getElementById('leaderboard-body');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const lastUpdatedSpan = document.getElementById('last-updated');
+
+            try {
+                // 同じフォルダにあるplaytime.jsonを読み込む
+                const response = await fetch('playtime.json');
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+
+                // 最終更新時間をセット
+                lastUpdatedSpan.textContent = data.last_updated || '不明';
+
+                // プレイヤー一覧をクリア
+                tbody.innerHTML = '';
+
+                // プレイ時間が長い順にソート
+                const sortedPlayers = data.players.sort((a, b) => b.playtime_seconds - a.playtime_seconds);
+
+                if (sortedPlayers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">データがありません</td></tr>';
+                } else {
+                    // テーブルに行を追加
+                    sortedPlayers.forEach((player, index) => {
+                        const row = document.createElement('tr');
+                        
+                        row.innerHTML = `
+                            <td class="rank">${index + 1}</td>
+                            <td>
+                                <div class="player-name">
+                                    <div class="avatar-placeholder"></div>
+                                    ${escapeHtml(player.name)}
+                                </div>
+                            </td>
+                            <td class="playtime">${formatPlaytime(player.playtime_seconds)}</td>
+                            <td class="last-seen">${player.last_seen || 'データなし'}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+
+                // 表示の切り替え
+                loading.style.display = 'none';
+                table.style.display = 'table';
+
+            } catch (err) {
+                console.error('Error loading playtime data:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                lastUpdatedSpan.textContent = 'エラー';
+            }
+        }
+
+        // XSS対策用のエスケープ関数
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, function(match) {
+                const escape = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                };
+                return escape[match];
+            });
+        }
+
+        // ページ読み込み時に実行
+        window.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+</html>
