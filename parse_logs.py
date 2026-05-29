@@ -6,28 +6,25 @@ from datetime import datetime
 # パスの設定
 LOG_FILE_PATH = "server.log"         # マイクラのサーバーログのパス
 OUTPUT_JSON_PATH = "playtime.json"   # WEBサイト表示用のJSON
-TOTAL_STATS_PATH = "total_stats.json" # 👈 【新設】過去の累積データを保存するファイル
+TOTAL_STATS_PATH = "total_stats.json" # 過去の累積データを保存するファイル
 
 def load_total_stats():
     """過去の累積データを読み込む関数。ファイルがなければ初期構造を返す。"""
     if os.path.exists(TOTAL_STATS_PATH):
         try:
             with open(TOTAL_STATS_PATH, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                data = json.load(f)
+                # 最低限必要なキーが存在するかチェックし、なければ初期化
+                if "accumulated_uptime_seconds" in data:
+                    return data
         except Exception as e:
             print(f"警告: {TOTAL_STATS_PATH} の読み込みに失敗したため、新規作成します。({e})")
     
-    # ファイルがない、または壊れている場合の初期データ
     return {
         "accumulated_uptime_seconds": 0,
         "accumulated_open_count": 0,
         "players": {} # xuid -> {name, playtime_seconds, join_count, last_seen}
     }
-
-def save_total_stats(data):
-    """累積データを保存する関数"""
-    with open(TOTAL_STATS_PATH, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
 
 def parse_logs():
     # 過去の累積（貯金）を読み込み
@@ -102,9 +99,7 @@ def parse_logs():
         current_log_uptime_seconds = int((datetime.now() - first_log_time).total_seconds())
 
 
-    # 2. 【最重要】過去の貯金データ（total_stats）と、今回のログのデータを合算する
-    
-    # サーバー全体の時間と回数を合算
+    # 2. 過去の貯金データ（total_stats）と、今回のログのデータを合算する
     final_server_uptime = total_stats["accumulated_uptime_seconds"] + current_log_uptime_seconds
     final_server_open_count = total_stats["accumulated_open_count"] + current_log_open_count
 
@@ -126,18 +121,26 @@ def parse_logs():
 
     # 3. データの書き出し
     
-    # WEB表示用の playtime.json を作成
+    # 【WEB表示用】playtime.json を作成
     output_data = {
         "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "server_uptime_seconds": final_server_uptime,
         "server_open_count": final_server_open_count,
         "players": list(final_players_map.values())
     }
-
     with open(OUTPUT_JSON_PATH, 'w', encoding='utf-8') as f:
         json.dump(output_data, f, ensure_ascii=False, indent=2)
 
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] playtime.json を正常に更新しました。")
+    # 👈【ここを書き忘れていました】次回計算のために、合算データを total_stats.json にも上書き保存して貯金する
+    new_total_stats = {
+        "accumulated_uptime_seconds": final_server_uptime,
+        "accumulated_open_count": final_server_open_count,
+        "players": final_players_map
+    }
+    with open(TOTAL_STATS_PATH, 'w', encoding='utf-8') as f:
+        json.dump(new_total_stats, f, ensure_ascii=False, indent=2)
+
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] playtime.json および total_stats.json を正常に更新しました。")
 
 if __name__ == "__main__":
     parse_logs()
