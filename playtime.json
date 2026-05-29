@@ -1,56 +1,6 @@
 {
-  "last_updated": "2026-05-29 11:09:48",
-  "server_uptime_seconds": 5441102,
-  "server_open_count": 194,
-  "players": [
-    {
-      "name": "F1ku2376",
-      "xuid": "2535459849782491",
-      "playtime_seconds": 368758,
-      "join_count": 221,
-      "last_seen": "2026-05-28 18:40:58"
-    },
-    {
-      "name": "Penbas1675",
-      "xuid": "2535412868977356",
-      "playtime_seconds": 305940,
-      "join_count": 92,
-      "last_seen": "2026-05-24 13:08:43"
-    },
-    {
-      "name": "Remonedo1882",
-      "xuid": "2535442245226493",
-      "playtime_seconds": 639105,
-      "join_count": 98,
-      "last_seen": "2026-05-29 04:54:09"
-    },
-    {
-      "name": "kamonohashi123",
-      "xuid": "2535426609617963",
-      "playtime_seconds": 299789,
-      "join_count": 92,
-      "last_seen": "2026-05-24 17:27:54"
-    },
-    {
-      "name": "NEKOMARU 119",
-      "xuid": "2535455351900966",
-      "playtime_seconds": 51744,
-      "join_count": 15,
-      "last_seen": "2026-05-28 19:16:09"
-    },
-    {
-      "name": "RustyDrake3638",
-      "xuid": "2535417070048526",
-      "playtime_seconds": 832,
-      "join_count": 2,
-      "last_seen": "2026-04-04 23:00:16"
-    },
-    {
-      "name": "zenless zero0",
-      "xuid": "2535415842750871",
-      "playtime_seconds": 1723,
-      "join_count": 1,
-      "last_seen": "2026-04-11 23:28:39"
-    }
-  ]
+  "last_updated": "2026-05-29 11:17:31",
+  "server_uptime_seconds": 0,
+  "server_open_count": 0,
+  "players": []
 }
