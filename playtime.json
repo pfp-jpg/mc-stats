@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-06-27 13:00:01",
-  "server_uptime_seconds": 7937920,
+  "last_updated": "2026-06-27 13:30:01",
+  "server_uptime_seconds": 7939720,
   "server_open_count": 259,
   "players": [
     {
       "name": "F1ku2376",
       "xuid": "2535459849782491",
-      "playtime_seconds": 370413,
-      "join_count": 226,
-      "last_seen": "2026-06-27 12:37:09"
+      "playtime_seconds": 370581,
+      "join_count": 227,
+      "last_seen": "2026-06-27 13:19:42"
     },
     {
       "name": "Penbas1675",
@@ -55,9 +55,9 @@
     {
       "name": "Squidka1",
       "xuid": "2535427169559513",
-      "playtime_seconds": 641,
-      "join_count": 1,
-      "last_seen": "2026-06-27 12:55:31"
+      "playtime_seconds": 1493,
+      "join_count": 2,
+      "last_seen": "2026-06-27 13:14:55"
     }
   ]
 }
