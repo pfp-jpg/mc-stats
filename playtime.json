@@ -1,19 +1,19 @@
 {
-  "last_updated": "2026-06-28 21:00:01",
-  "server_uptime_seconds": 8053120,
+  "last_updated": "2026-06-28 21:30:01",
+  "server_uptime_seconds": 8054920,
   "server_open_count": 261,
   "players": [
     {
       "name": "F1ku2376",
       "xuid": "2535459849782491",
-      "playtime_seconds": 370671,
-      "join_count": 228,
-      "last_seen": "2026-06-27 18:32:10"
+      "playtime_seconds": 371582,
+      "join_count": 229,
+      "last_seen": "2026-06-28 21:16:09"
     },
     {
       "name": "Penbas1675",
       "xuid": "2535412868977356",
-      "playtime_seconds": 337202,
+      "playtime_seconds": 338178,
       "join_count": 102,
       "last_seen": "オンライン中"
     },
@@ -55,9 +55,9 @@
     {
       "name": "Squidka1",
       "xuid": "2535427169559513",
-      "playtime_seconds": 1493,
-      "join_count": 2,
-      "last_seen": "2026-06-27 13:14:55"
+      "playtime_seconds": 2379,
+      "join_count": 3,
+      "last_seen": "オンライン中"
     }
   ]
 }
