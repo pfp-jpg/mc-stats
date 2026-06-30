@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-06-29 19:30:01",
-  "server_uptime_seconds": 8134120,
+  "last_updated": "2026-06-29 20:00:01",
+  "server_uptime_seconds": 8135920,
   "server_open_count": 261,
   "players": [
     {
@@ -55,9 +55,9 @@
     {
       "name": "Squidka1",
       "xuid": "2535427169559513",
-      "playtime_seconds": 6927,
+      "playtime_seconds": 7494,
       "join_count": 4,
-      "last_seen": "オンライン中"
+      "last_seen": "2026-06-29 19:34:26"
     }
   ]
 }
