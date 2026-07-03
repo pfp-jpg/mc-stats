@@ -1,5 +1,5 @@
-[11:00:01] playtime.json を正常に更新しました。（開閉回数: 194）
-[main e6cd942] Auto-update playtime: 2026-05-29 11:00:01
- 1 file changed, 2 insertions(+), 2 deletions(-)
+[19:30:01] playtime.json を本物の合計ベースで安全に更新しました。
+[main 1d19c46] Auto-update playtime: 2026-07-03 19:30:01
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 To https://github.com/pfp-jpg/mc-stats.git
-   3bc8b00..e6cd942  main -> main
+   80b588a..1d19c46  main -> main
