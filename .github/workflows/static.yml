@@ -24,6 +24,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 【追加】リポジトリ内に紛れ込んでいるシンボリックリンクをここで削除する
+      - name: Remove symlinks to avoid deploy failure
+        run: find . -type l -delete
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
@@ -32,7 +36,6 @@ jobs:
         with:
           name: github-pages
           path: '.'
-          follow-symlinks: 'true' # シンボリックリンクのエラーを回避
 
       - name: Deploy to GitHub Pages
         id: deployment
